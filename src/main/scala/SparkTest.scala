@@ -1,7 +1,7 @@
 import org.apache.spark.{SparkConf, SparkContext}
 
 object SimpleApp {
-  def main(args: Array[String]) {
+  def main2(args: Array[String]) {
     val conf = new SparkConf().setAppName("Simple Application")
     val sc = new SparkContext(conf)
     val inputPath = "/Users/hwang/IdeaProjects/githubstat/data/"
