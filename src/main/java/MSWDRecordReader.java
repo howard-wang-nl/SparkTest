@@ -23,6 +23,7 @@ public class MSWDRecordReader implements RecordReader<LongWritable, Text> {
     private FSDataInputStream fileIn;
     int maxLineLength;
     private Text bufLookAhead = new Text("");
+    private int offsetLookAhead; // bytes read into bufLookAhead, not equal to length of data stored there.
 
     private static final Log LOG = LogFactory.getLog(
             MSWDRecordReader.class);
@@ -64,8 +65,8 @@ public class MSWDRecordReader implements RecordReader<LongWritable, Text> {
         Text tmp = new Text();
 
         // fetch content of the look ahead buf.
-        offset =  bufLookAhead.getLength();
-        text.append(bufLookAhead.getBytes(), 0, offset);
+        text.append(bufLookAhead.getBytes(), 0, bufLookAhead.getLength());
+        offset = offsetLookAhead; // offset counts also EOL, which is not saved by readLine in Text buf.
         bufLookAhead.clear();
 
         for (int i = 0; i < maxBytesToConsume; i++) {
@@ -87,11 +88,12 @@ public class MSWDRecordReader implements RecordReader<LongWritable, Text> {
                 break;
             } else if (i > 0 && isNewRecord(s)) { // not first line in this read and is a new record line.
                 bufLookAhead.append(tmp.getBytes(), 0, tmp.getLength()); // save next record line for next read.
+                offsetLookAhead = offsetTmp;
                 // Begin of next record, don't count this line in offset, but keep it in bufLookAhead for later use.
                 break;
             } else { // not start of record, continue reading. V lines or incomplete lines at start of split.
                 // Append line to record
-                if (offset >0) text.append(EOL.getBytes(), 0, EOL.getLength()); // prepend EOF is text buf not empty.
+                if (offset >0) text.append(EOL.getBytes(), 0, EOL.getLength()); // prepend EOF if text buf not empty.
                 text.append(tmp.getBytes(), 0, tmp.getLength());
                 offset += offsetTmp;
             }

@@ -43,6 +43,7 @@ object MSWebData {
     val sc = new SparkContext(conf)
  //   val s = sc.textFile(inputFile)
     val rawData: RDD[(LongWritable, Text)] = sc.hadoopFile[LongWritable, Text, MSWDInputFormat](inputFile)
+//    rawData.foreach(x => println("%d, %s".format(x._1.get, x._2.toString)))
     rawData.saveAsTextFile(outputFile)
   }
 }
