@@ -44,6 +44,7 @@ object MSWebData {
  //   val s = sc.textFile(inputFile)
     val rawData: RDD[(LongWritable, Text)] = sc.hadoopFile[LongWritable, Text, MSWDInputFormat](inputFile)
 //    rawData.foreach(x => println("%d, %s".format(x._1.get, x._2.toString)))
+    rawData.map(x => (x._1.get, x._2.toString)).collect.foreach(println)
     rawData.saveAsTextFile(outputFile)
   }
 }
