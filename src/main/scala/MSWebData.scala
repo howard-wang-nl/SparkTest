@@ -1,3 +1,4 @@
+import au.com.bytecode.opencsv.CSVParser
 import org.apache.hadoop.io.{LongWritable, Text}
 import org.apache.hadoop.mapred.{InputSplit, JobConf, RecordReader, Reporter, TextInputFormat}
 import org.apache.spark.rdd.RDD
@@ -38,13 +39,17 @@ object MSWebData {
   val inputFile = "/Users/hwang/IdeaProjects/SparkTest/data/anonymous-msweb.test"
   val outputFile = "/Users/hwang/IdeaProjects/SparkTest/data/anonymous-msweb.rdd"
 
+  def parseCSV(s: String):Array[String] = {
+    val p = new CSVParser()
+    p.parseLine(s)
+  }
+
   def main(args: Array[String]) = {
     val conf = new SparkConf().setAppName("MSWebData")
     val sc = new SparkContext(conf)
  //   val s = sc.textFile(inputFile)
     val rawData: RDD[(LongWritable, Text)] = sc.hadoopFile[LongWritable, Text, MSWDInputFormat](inputFile)
-//    rawData.foreach(x => println("%d, %s".format(x._1.get, x._2.toString)))
-    rawData.map(x => (x._1.get, x._2.toString)).collect.foreach(println)
+    rawData.map(t => parseCSV(t._2.toString)).foreach(_.foreach(println))
     rawData.saveAsTextFile(outputFile)
   }
 }

@@ -45,7 +45,7 @@ public class MSWDRecordReader implements RecordReader<LongWritable, Text> {
         // because we always (except the last split) read one extra record in
         // next() method.
         if (start != 0) {
-            start += readNext(new Text(), maxLineLength, maxBytesToConsume(start)); // ??? Why maxLineLength == 0 here?
+            start += readNext(new Text(), maxLineLength, maxBytesToConsume(start)); // ??? Why maxLineLength == 0 here in original LineRecordReader.java?
         }
         this.pos = start;
     }
